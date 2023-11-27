@@ -31,6 +31,7 @@ export default function App() {
   const [totalPages, setTotalPages] = useState(1);
   const { data: rawFeed, isPending } = useAxios(`getFeed?page=${currentPage}`, 'get');
   const [feed, setFeed] = useState([]);
+  const [initialStats, setInitialStats] = useState({});
   const [error, setError] = useState("");
   const [hideHeader, setHideHeader] = useState(false);
 
@@ -54,6 +55,7 @@ const WS_URL = 'ws://192.168.0.2:8081/stats';
       setFeed(existing => [...existing, ...rawFeed.content]);
       if (rawFeed.currentPage == 1) {
         setTotalPages(rawFeed.totalPages);
+        setInitialStats(rawFeed.initialStatsUpdate)
       }
       setCurrentPage(rawFeed.currentPage);
     } else {
@@ -74,13 +76,10 @@ const WS_URL = 'ws://192.168.0.2:8081/stats';
 
   };
 
-  function WelcomeHeader({hide}){
+  function WelcomeHeader(){
 
     return (
-      <Center style={{
-        transform: `translate3d(0, ${hide ? rem(-110) : 0 }, 0)`,
-        transition: 'transform 400ms ease',
-    }}>
+      <Center>
             <Text size="xl" weight={800}>
               Welcome to Anti Fomo Feed!
             </Text>
@@ -114,8 +113,7 @@ const WS_URL = 'ws://192.168.0.2:8081/stats';
         <div>
           <Space h={"xs"} />
           { !hideHeader && 
-          <WelcomeHeader hide={hideHeader}
-          />
+          <WelcomeHeader/>
           }
           <StompSessionProvider
       url={WS_URL}
@@ -123,12 +121,12 @@ const WS_URL = 'ws://192.168.0.2:8081/stats';
         console.log(str);
       }}
     >
-          <Container size={"xl"} mt={'1em'}>
+          <Container size={"xl"} mt={'0.5`` em'}>
             {feed && feed.length > 0
               ?
               <>
-              <Stats linksOnPage={feed.length} />
-              <ScrollArea type="always" scrollbarSize={20}
+              <Stats linksOnPage={feed.length} initialStats ={initialStats}/>
+              <ScrollArea type="always" scrollbarSize={20} 
                 style={{ height: 'calc(100vh - 110px)' }}
                 viewportRef={scrollRef}
                 onScrollPositionChange={onScrollPositionChange}>

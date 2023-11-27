@@ -43,16 +43,19 @@ const useStyles = createStyles((theme) => ({
 }));
 
 
-export function Stats({ linksOnPage }) {
+export function Stats({ linksOnPage, initialStats }) {
   const { classes, theme } = useStyles();
-  const [remaining, setRemaining] = useState(0);
-  const [totalViewedAllTime, setTotalViewedAllTime] = useState(0);
+  const [remaining, setRemaining] = useState(initialStats.remaining);
+  const [totalViewedAllTime, setTotalViewedAllTime] = useState(initialStats.totalViewedAllTime);
+
 
     useSubscription("/topic/statsupdate", (message) => {
       var statsUpdate = JSON.parse(message.body)
       setTotalViewedAllTime(statsUpdate.totalViewedAllTime)
       setRemaining(statsUpdate.remaining)
     });
+
+
 
   return (
     <Card withBorder p="xl" radius="md" className={classes.card}>
@@ -97,7 +100,7 @@ export function Stats({ linksOnPage }) {
             label={
               <div>
                 <Text align="center" size="lg" className={classes.label} sx={{ fontSize: 22 }}>
-                  {((remaining == 0 || totalViewedAllTime == 0 ) ? 0 : (totalViewedAllTime / remaining) * 100).toFixed(0)}%
+                  {(remaining === 0 || totalViewedAllTime === 0 ) ? 0 : ((totalViewedAllTime / remaining) * 100).toFixed(4)}%
                 </Text>
                 <Text align="center" size="xs" color="dimmed">
                 Viewed
